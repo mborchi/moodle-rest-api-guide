@@ -70,6 +70,10 @@ print(wstoken)
 
 ```bash
 RAW="<CADENA_BASE64>"
+RAW="${RAW#moodlemobile://token=}"
+RAW="${RAW%%&*}"
+MOD=$((${#RAW} % 4))
+[ "$MOD" -gt 0 ] && RAW="$RAW$(printf '%.*s' $((4 - MOD)) '====')"
 printf '%s' "$RAW" | base64 -d | awk -F':::' '{print $2}'
 ```
 

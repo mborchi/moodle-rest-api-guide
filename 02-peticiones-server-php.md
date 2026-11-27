@@ -368,7 +368,11 @@ if courses:
     for course in assign_data.get("courses", []):
         cname = courses.get(course["id"], course.get("shortname", str(course["id"])))
         for assign in course.get("assignments", []):
-            st = moodle_call("mod_assign_get_submission_status", assignid=assign["id"])
+            # Si quieres omitir tareas ocultas, filtra antes por uservisible=True en core_course_get_contents.
+            try:
+                st = moodle_call("mod_assign_get_submission_status", assignid=assign["id"])
+            except RuntimeError:
+                continue  # Las tareas restringidas a otro grupo pueden devolver error de contexto.
             last = st.get("lastattempt") or {}
             sub_status = (last.get("submission") or {}).get("status", "new")
             due_ts = last.get("extensionduedate") or assign.get("duedate") or 0
